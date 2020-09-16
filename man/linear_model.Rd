@@ -4,28 +4,25 @@
 \alias{linear_model}
 \title{Linear Model Function}
 \usage{
-linear_model(
-  formula,
-  data,
-  subset,
-  weights,
-  na.action,
-  method = "qr",
-  model = TRUE,
-  x = FALSE,
-  y = FALSE,
-  qr = TRUE,
-  singular.ok = TRUE,
-  contrasts = NULL,
-  offset,
-  ...
-)
+linear_model(formula, data, contrasts = NULL)
+}
+\arguments{
+\item{formula}{A formula}
+
+\item{data}{A dataframe}
+
+\item{contrasts}{Contrasts argument}
+}
+\value{
+A list of coefficients
 }
 \description{
 This is the 1st homework assignment of BIS557.
 }
 \examples{
-linear_model(y~X, data=df)
+\dontrun{
+linear_model(body_mass_g ~ bill_depth_mm, penguins)
+}
 }
 \author{
 Yijun Yang

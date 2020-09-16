@@ -1,84 +1,33 @@
 #' @title Linear Model Function
 #' @author Yijun Yang
 #' @description This is the 1st homework assignment of BIS557.
+#' @param formula A formula
+#' @param data A dataframe
+#' @param contrasts Contrasts argument
+#' @return A list of coefficients
 #' @examples
-#' linear_model(y~X, data=df)
+#' \dontrun{
+#' linear_model(body_mass_g ~ bill_depth_mm, penguins)
+#' }
 #' @export
 
-#linear_model <- function(formula, data, contrasts=NULL){
-#  return(lm(formula, data, contrasts))
-#}
 
-linear_model <- function (formula, data, subset, weights, na.action, method = "qr",
-          model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE,
-          contrasts = NULL, offset, ...)
-{
-  ret.x <- x
-  ret.y <- y
-  cl <- match.call()
-  mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "subset",
-               "weights", "na.action", "offset"),
-             names(mf), 0L)
-  mf <- mf[c(1L, m)]
-  mf$drop.unused.levels <- TRUE
-  mf[[1L]] <- quote(stats::model.frame)
-  mf <- eval(mf, parent.frame())
-  if (method == "model.frame")
-    return(mf)
-  else if (method != "qr")
-    warning(gettextf("method = '%s' is not supported. Using 'qr'",
-                     method), domain = NA)
-  mt <- attr(mf, "terms")
-  y <- model.response(mf, "numeric")
-  w <- as.vector(model.weights(mf))
-  if (!is.null(w) && !is.numeric(w))
-    stop("'weights' must be a numeric vector")
-  offset <- model.offset(mf)
-  mlm <- is.matrix(y)
-  ny <- if (mlm)
-    nrow(y)
-  else length(y)
-  if (!is.null(offset)) {
-    if (!mlm)
-      offset <- as.vector(offset)
-    if (NROW(offset) != ny)
-      stop(gettextf("number of offsets is %d, should equal %d (number of observations)",
-                    NROW(offset), ny), domain = NA)
-  }
-  if (is.empty.model(mt)) {
-    x <- NULL
-    z <- list(coefficients = if (mlm) matrix(NA_real_, 0,
-                                             ncol(y)) else numeric(), residuals = y, fitted.values = 0 *
-                y, weights = w, rank = 0L, df.residual = if (!is.null(w)) sum(w !=
-                                                                                0) else ny)
-    if (!is.null(offset)) {
-      z$fitted.values <- offset
-      z$residuals <- y - offset
-    }
-  }
-  else {
-    x <- model.matrix(mt, mf, contrasts)
-    z <- if (is.null(w))
-      lm.fit(x, y, offset = offset, singular.ok = singular.ok,
-             ...)
-    else lm.wfit(x, y, w, offset = offset, singular.ok = singular.ok,
-                 ...)
-  }
-  class(z) <- c(if (mlm) "mlm", "lm")
-  z$na.action <- attr(mf, "na.action")
-  z$offset <- offset
-  z$contrasts <- attr(x, "contrasts")
-  z$xlevels <- .getXlevels(mt, mf)
-  z$call <- cl
-  z$terms <- mt
-  if (model)
-    z$model <- mf
-  if (ret.x)
-    z$x <- x
-  if (ret.y)
-    z$y <- y
-  if (!qr)
-    z$qr <- NULL
-  z
+linear_model <- function (formula, data, contrasts = NULL){
+
+  #get design matrix
+  X <- model.matrix(formula, data, contrasts.arg = contrasts)
+
+  #get response
+  Y <- data[,all.vars(formula)[1]]
+
+  #compute coefficients
+  beta <- qr.coef(qr(X), Y)
+
+  #fail message: NA - 0 == NA
+  #turn beta = 0 into NA
+  beta[beta==0] <- NA
+
+  #return same type as lm()
+  list(coefficients = beta)
+
 }
