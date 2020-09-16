@@ -27,7 +27,7 @@ The goal of bis557 is to ...
 You can install the released version of bis557 from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("bis557")
+#install.packages("bis557")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
@@ -41,7 +41,7 @@ devtools::install_github("yijunyang/bis557")
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-library(bis557)
+# library(bis557)
 ## basic example code
 ```
 
