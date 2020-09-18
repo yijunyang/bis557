@@ -1,8 +1,8 @@
 #' @title Linear Model Function
 #' @author Yijun Yang
 #' @description This is the 1st homework assignment of BIS557.
-#' @param formula A formula
-#' @param data A dataframe
+#' @param form A formula
+#' @param d A dataframe
 #' @param contrasts Contrasts argument
 #' @return A list of coefficients
 #' @examples
@@ -12,16 +12,16 @@
 #' @export
 
 
-linear_model <- function (formula, data, contrasts = NULL){
+linear_model <- function (form, d, contrasts = NULL){
 
   #get design matrix
-  X <- model.matrix(formula, data, contrasts.arg = contrasts)
+  X <- model.matrix(form, d, contrasts.arg = contrasts)
 
   #get response
-  Y <- data[,all.vars(formula)[1]]
+  Y <- d[,all.vars(form)[1]]
 
   #compute coefficients
-  beta <- qr.coef(qr(X), Y)
+  beta <- qr.solve(qr(X), Y)
 
   #fail message: NA - 0 == NA
   #turn beta = 0 into NA
