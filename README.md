@@ -11,7 +11,7 @@ status](https://travis-ci.com/yijunyang/bis557.svg?branch=master)](https://travi
 coverage](https://coveralls.io/repos/github/yijunyang/bis557/badge.svg)](https://coveralls.io/r/yijunyang/bis557?branch=master)
 <!-- badges: end -->
 
-The goal of bis557 is to …
+This is the homework/project presentation of Yale Course BIS557 Computational Statistics (2020 Fall)
 
 ## Installation
 
