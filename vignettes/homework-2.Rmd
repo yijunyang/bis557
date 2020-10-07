@@ -1,0 +1,238 @@
+---
+title: "homework-2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{homework-2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+This is the 2nd homework of Yale course bis557 (due October 7th).
+
+0. Create a "homework-2" vignette in your bis557 package.
+1. CASL 2.11 Exercises problem number 5. Include the write up in your homework-2 vignette.
+2. Implement a new function fitting the OLS model using gradient descent that calculates the penalty based on the out-of-sample accuracy. Create test code. How does it compare to the OLS model? Include the comparison in your "homework-2" vignette.
+3. Implement a ridge regression function taking into account colinear (or nearly colinear) regression variables. Create test code for it. Show that it works in your homework-2 vignette.
+4. Implement your own method and testing for optimizing the ridge parameter $\lambda$. Show that it works in your homework-2 vignette.
+5. Consider the LASSO penalty
+$$
+\frac{1}{2n} ||Y - X \beta||_2^2 + \lambda ||\beta||_1.
+$$
+Show that if $|X_j^TY| \leq n \lambda$, then $\widehat \beta^{\text{LASSO}}$ must be zero.
+
+
+
+# Problem 1
+- Consider the simple regression model with only a scalar x and intercept:
+$y=\beta_0 + \beta_1x$. Using the explicit formula for the inverse of a 2-by-2 matrix, write down the least squares estimators for $\hat {\beta_0}$ and $\hat {\beta_1}$.
+
+For OLS, we know that $\hat \beta = (X^TX)^{-1}X^TY$.  
+Rewrite $y=\beta_0 + \beta_1x$ as $Y=X\beta$, where  
+$$
+Y = 
+\left[
+  \begin{matrix}
+    y_1 \\
+    y_2 \\
+    \cdots \\
+    y_n \\
+  \end{matrix}
+\right] 
+
+\hspace{1cm}
+
+X = 
+\left[
+  \begin{matrix}
+    1 & x_{1} \\
+    1 & x_{2} \\
+    \cdots  & \cdots \\
+    1 & x_{n} \\
+  \end{matrix}
+\right] 
+
+\hspace{1cm}
+
+\beta = 
+\left[
+  \begin{matrix}
+    \beta_{0} \\
+    \beta_{1} \\
+  \end{matrix}
+\right]
+$$
+Then we can calculate $\hat \beta$:
+
+$$
+X^TX = 
+\left[
+  \begin{matrix}
+    1 & \cdots &1 \\
+    x_1 & \cdots & x_n
+  \end{matrix}
+\right]
+
+\left[
+  \begin{matrix}
+    1 & x_1 \\
+    \cdots & \cdots \\
+    1 & x_n
+  \end{matrix}
+\right]
+
+=
+
+\left[
+  \begin{matrix}
+    n & \sum{x_i} \\
+    \sum{x_i} & \sum{x_i^2}
+  \end{matrix}
+\right]
+
+\\
+
+(X^TX)^{-1} =
+
+\frac{1}{n\sum{x_i^2}-(\sum{x_i})^2}
+
+\left[
+  \begin{matrix}
+    \sum{x_i^2} & -\sum{x_i} \\
+    -\sum{x_i} & n
+  \end{matrix}
+\right]
+$$
+Let $\alpha$ represent $\frac{1}{n\sum{x_i^2}-(\sum{x_i})^2}$,
+
+$$
+\begin{aligned}
+
+(X^TX)^{-1}X^T &= \alpha
+
+\left[
+  \begin{matrix}
+    \sum{x_i^2} & -\sum{x_i} \\
+    -\sum{x_i} & n
+  \end{matrix}
+\right]
+\left[
+  \begin{matrix}
+    1 & \cdots &1 \\
+    x_1 & \cdots & x_n
+  \end{matrix}
+\right]
+
+\\
+
+&= \alpha
+
+\left[
+  \begin{matrix}
+    \sum{x_i^2}-(\sum{x_i})x_1 & \cdots & \sum{x_i^2}-(\sum{x_i})x_n \\
+    -\sum{x_i}+nx_1 & \cdots & -\sum{x_i}+nx_n 
+  \end{matrix}
+\right]
+
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\beta &= (X^TX)^{-1}X^TY = \alpha
+
+\left[
+  \begin{matrix}
+    \sum{x_i^2}-(\sum{x_i})x_1 & \cdots & \sum{x_i^2}-(\sum{x_i})x_n \\
+    -\sum{x_i}+nx_1 & \cdots & -\sum{x_i}+nx_n 
+  \end{matrix}
+\right]
+
+\left[
+  \begin{matrix}
+    y_1 \\
+    y_2 \\
+    \cdots \\
+    y_n \\
+  \end{matrix}
+\right] 
+
+\\
+
+&= \frac{1}{n\sum{x_i^2}-(\sum{x_i})^2} 
+\left[
+  \begin{matrix}
+    \sum{x_i^2}\sum{y_i}-\sum{x_i y_i}\sum{x_i} \\
+    -\sum{x_i} \sum{y_i} + n \sum{x_i y_i}
+  \end{matrix}
+\right] 
+
+\end{aligned}
+$$
+
+# Problem 2
+
+- How does the OLS model using gradient descent that calculates the penalty based on the out-of-sample accuracy compare to the OLS model? 
+
+```{r}
+data("iris")
+
+gd <- gradient_descent_new(Sepal.Length ~ ., iris)$coefficients
+lm <- lm(Sepal.Length ~ ., iris)$coefficients
+compare <- as.data.frame(cbind(gd, lm))
+colnames(compare) <- c("gradient descent", "OLS")
+compare
+
+```
+
+# Problem 3
+
+- Show that my ridge regression function works when colinear (or nearly colinear) regression variables exists.
+
+```{r}
+data("iris")
+
+# create a colinear term
+iris$colinear <- 2*iris$Petal.Width
+
+# run the ridge regression function - it works without error
+ridge_regression(Sepal.Length ~ ., iris, lambda = 0.1)
+```
+
+
+# Problem 4
+
+- Implement your own method and testing for optimizing the ridge parameter $\lambda$.
+
+```{r, warning = FALSE}
+data("iris")
+
+# run the ridge regression function with cross validation
+cv_ridge(form = Sepal.Length ~ ., d=iris, lambda = seq(0, 0.05 ,0.001))
+
+```
+The best lambda is 0.01.
+
+# Problem 5
+
+$$
+f(\beta)=\frac{1}{2 n} \sum_{i=1}^{n}\left(y_{i}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \sum_{j=1}^{p}|\beta_{j}|
+$$
+$$
+\frac{\partial f(\beta)}{\partial \beta_l}  =
+-\frac{1}{n} \sum ^n _{i=1}x_{il}(y_i - \tilde y ^{(l)}) 
++\sum ^n _{i=1} x_{il} \tilde {\beta_l} + \lambda \alpha
+
+$$
+
+$$
+\tilde{\beta}_l = \frac{1}{n} \sum^n_{i=1} x_{il} (y_i -\tilde{y}^{(l)}) - \lambda
+$$
+
+Rewrite into matrix notation:
+
+$$
+\tilde{\beta}_l = \frac{1}{n} X^T_j Y - \lambda
+$$
+If $|X^T_j| \le n\lambda$, then $\frac{1}{n} X^T_j Y - \lambda \le 0$, which means $\tilde \beta_l \le 0$. In Lasso, coefficient shrink to 0 when the absolutevalue of that least squares coefficient is less than $\lambda/2$. Therefore, when $\tilde \beta_l \le 0$, $\tilde \beta_l$ must be set to $0$.
+

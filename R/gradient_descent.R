@@ -7,7 +7,7 @@
 #' @param iters Number of maximum iterations
 #' @param gamma The learning rate
 #' @param threshold Threshold for the difference between RSS of new and old betas.
-#' @return
+#' @return a list of beta coefficients
 #' @examples
 #' \dontrun{
 #' gradient_descent(body_mass_g ~ bill_depth_mm, penguins)
