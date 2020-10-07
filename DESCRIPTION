@@ -22,5 +22,7 @@ Depends:
     R (>= 2.10),
     rsample,
     foreach,
-    tibble
+    tibble,
+    ggplot2,
+    purrr
 VignetteBuilder: knitr
