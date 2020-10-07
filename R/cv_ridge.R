@@ -6,6 +6,7 @@
 #' @param folds number of folds
 #' @param lambdas a vector of ridge penalty term
 #' @return the best lambda for ridge regression and a plot
+#' @import glmnet
 #' @examples
 #' \dontrun{
 #' cv_ridge(body_mass_g ~ bill_depth_mm, penguins, folds = 5, lambdas = seq(1, 10, 1))

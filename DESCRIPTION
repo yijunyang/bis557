@@ -24,5 +24,6 @@ Depends:
     foreach,
     tibble,
     ggplot2,
-    purrr
+    purrr,
+    glmnet
 VignetteBuilder: knitr
