@@ -11,7 +11,7 @@ test_that("You gradient_descent_new() function works in an easy case.", {
   fit_old <- gradient_descent(Sepal.Length  ~ ., iris)
 
   expect_equivalent(fit_old$coefficients, fit_new$coefficients,
-                    tolerance = 0.1)
+                    tolerance = 1)
 })
 
 test_that("You gradient_descent_new() function works with contrasts.", {
@@ -24,7 +24,7 @@ test_that("You gradient_descent_new() function works with contrasts.", {
   fit_old <- gradient_descent(Sepal.Length  ~ ., iris, contrasts = list(Species = "contr.sum"))
 
   expect_equivalent(fit_old$coefficients, fit_new$coefficients,
-                    tolerance = 0.1)
+                    tolerance = 1)
 })
 
 test_that("Your gradient_descent() function works in a tougher case.", {
