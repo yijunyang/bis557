@@ -1,0 +1,151 @@
+---
+title: "homework-3"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{homework-3}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE}
+library(bis557)
+```
+
+# Problem 1
+
+> CASL 5.8 Exercise number 2. Include the write up in your homework-2 vignette.
+>
+>We mentioned that the Hessian matrix in Equation 5.19 can be more illconditioned than the matrix $X^tX$ itself. Generate a matrix $X$ and propabilities $p$ such that the linear Hessian ($X^tX$) is well-conditioned but the logistic variation is not.
+
+### Linear Hessian
+
+First, calculate linear Hessian ($X^tX$). Calculate the ratio of max singular value to minimun singular value. The result is small, which means linear Hessian is well-conditioned. 
+
+```{r}
+X <- cbind(rep(1,6), c(-3, -3, -3, 3, 3, 3))
+H <- t(X) %*% X
+
+# Refer to CASL p100
+singular_values <- svd(H)$d
+max(singular_values) / min(singular_values)
+```
+
+### Logistic Variation
+
+Then, calculate logistic variation($X^tDX$). Calculate the ratio of max singular value to minimun singular value. The result is large, which means logistic variation is ill-conditioned. 
+
+```{r}
+beta <- c(0.2, 2)
+mu <- 1 / (1 + exp(-X %*% beta))
+D <- diag(as.vector(mu), 6, 6)
+H <- t(X) %*% D %*% X
+singular_values <- svd(H)$d
+max(singular_values) / min(singular_values)
+```
+
+
+# Problem 2
+
+> Describe and implement a first-order solution for the GLM maximum likelihood problem using only gradient information, avoiding the Hessian matrix. Include both a constant step size along with an adaptive one. You may use a standard adaptive update Momentum, Nesterov, AdaGrad, Adam, or your own. Make sure to explain your approach and compare it’s performance with a constant step size.
+
+### Set up the dataset for comparison
+
+```{r}
+data("penguinsi")
+penguinsi$sex <- as.numeric(penguinsi$sex) - 1
+form <- sex ~ bill_length_mm + bill_depth_mm
+d = penguinsi
+mms <- make_model_matrices(form, d)
+X <- mms$X
+Y <- mms$Y
+```
+
+### Results for constant step
+
+The function `glm_constant` has been established in a seperate file `gradient_descent_glm.R`. Now check the results for a constant step.
+
+```{r}
+(fit_c <- glm_constant(X, Y, mu_fun = function(eta) 1/(1+exp(-eta)), var_fun = function(eta) eta))
+```
+
+
+### Results for adaptive step
+
+We can incorporate a term known as the *momentum* into the algorithm.  The gradient computed on each mini-batch is used to update the momentum term, and the momentum term is then used to update the current weights.This setup gives the SGD algorithm three useful
+properties: if the gradient remains relatively unchanged over several steps it will ‘pick-up speed’ (momentum) and effectively use a larger learning rate; if the gradient is changing rapidly, the step-sizes will shrink accordingly; when passing through a saddle point, the built up momentum from prior steps helps propel the algorithm past the point. (refer to CASL p230)
+
+The function `glm_adapt` has been established in a seperate file `gradient_descent_glm.R`. Now check the results for an adaptive step.
+
+```{r}
+(fit_a <- glm_adapt(X, Y, mu_fun = function(eta) 1/(1+exp(-eta)), var_fun = function(eta) eta))
+```
+
+### Reference results
+
+Use the results from `glm` function as the reference.
+
+```{r}
+(fit_ref <- glm(form, penguinsi, family = binomial)$coefficients)
+```
+
+### Conclusion
+
+Combine the results together to compare, we can see that the constant step method fits fairly good, but not quite close to the reference. The adaptive step method fits much better, and even equivalent to the reference.
+
+```{r}
+compare <- as.data.frame(cbind(fit_c$beta, fit_a$beta, fit_ref))
+colnames(compare) <- c('constant','adaptive','reference')
+compare
+```
+
+# Problem 3
+
+> Describe and implement a classification model generalizing logistic regression to accommodate more than two classes.
+
+### Set up the dataset for comparison
+
+```{r}
+data("penguinsi")
+# penguinsi$species <- as.numeric(penguinsi$species)
+# 1:"Adelie" 2:"Chinstrap" 3:"Gentoo"
+form <- species ~ bill_length_mm + bill_depth_mm
+d <- penguinsi
+```
+
+### Implement a classification model
+
+The function `multiclass_logistic` has been established in a seperate file `multiclass_logistic.R`. Now check the classification results. The results contain: (1) beta coefficients; (2) the misclassification error; (3) a detailed classification table
+
+```{r, warning = FALSE}
+multiclass_logistic(form, d)
+```
+
+### Use multinomial regression as a reference answer
+
+```{r, warning = FALSE}
+library(nnet)
+
+# build model
+multinomModel <- multinom(form, data = penguinsi)
+summary(multinomModel)
+
+# prediction performance
+predicted_class <- predict(multinomModel, penguinsi)
+table(predicted_class, penguinsi$species)
+
+# misclassification error
+mean(as.character(predicted_class) != as.character(penguinsi$species))
+```
+
+### Conclusion
+
+The misclassification error is 4.4% for my method and 3.5% for `multinom` function in `nnet` package. They are similar while `multinom` performs better in this case.
+
+
