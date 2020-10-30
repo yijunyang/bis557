@@ -2,10 +2,13 @@
 
 S3method(predict,ridge_regression)
 export(cv_ridge)
+export(glm_adapt)
+export(glm_constant)
 export(gradient_descent)
 export(gradient_descent_new)
 export(linear_model)
 export(make_model_matrices)
+export(multiclass_logistic)
 export(ridge_regression)
 import(glmnet)
 import(purrr)
