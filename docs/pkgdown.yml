@@ -1,0 +1,10 @@
+pandoc: '2.6'
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  homework-1: homework-1.html
+  homework-2: homework-2.html
+  homework-3: homework-3.html
+  homework-4: homework-4.html
+last_built: 2020-11-23T03:49Z
+
