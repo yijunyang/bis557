@@ -183,7 +183,7 @@ $$
 
 # Problem 2
 
-- How does the OLS model using gradient descent that calculates the penalty based on the out-of-sample accuracy compare to the OLS model? 
+- How does the OLS model using gradient descent that calculates the loss based on the out-of-sample accuracy compare to the OLS model? 
 
 ```{r}
 data("iris")
