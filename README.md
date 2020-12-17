@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bis557
+# bis557 - A Package for Computational Statistics
 
 <!-- badges: start -->
 
@@ -53,7 +53,10 @@ X <- mms$X
 Y <- mms$Y
 
 # implement ridge regression
-ridge_regression(form, d, lambda = 10))
+ridge_regression(form, d, lambda = 10)
+
+# run the ridge regression function with cross validation
+cv_ridge(form, d, lambda = seq(0, 0.05 ,0.001))
 ```
 
 <!--

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIS557 HW#1 • bis557</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/simplex/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -85,39 +85,69 @@
 <a href="#bis557" class="anchor"></a>bis557</h1></div>
 <!-- badges: start -->
 
-<p>This is the homework/project presentation of Yale Course BIS557 Computational Statistics (2020 Fall)</p>
+<p>This package contains course materials from Yale BIS557 Computational Statistics (2020 Fall). The goal is to design and implement algorithms for statistical analyses, including regression models (ridge/lasso/multi-logistic), cross-validation, stochastic gradient descent, neural networks, etc. R and Python code are designed for the implementation.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the released version of bis557 from <a href="https://CRAN.R-project.org">CRAN</a> with:</p>
+<!-- You can install the released version of bis557 from
+[CRAN](https://CRAN.R-project.org) with:
+
+``` r
+#install.packages("bis557")
+```
+-->
+<p>You can install the development version from <a href="https://github.com/">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#install.packages("bis557")</span></code></pre></div>
-<p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"yijunyang/bis557"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example" class="anchor"></a>Example</h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># library(bis557)</span>
-<span class="co">## basic example code</span></code></pre></div>
-<p>What is special about using <code>README.Rmd</code> instead of just <code>README.md</code>? You can include R chunks like so:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">cars</span><span class="op">)</span>
-<span class="co">#&gt;      speed           dist       </span>
-<span class="co">#&gt;  Min.   : 4.0   Min.   :  2.00  </span>
-<span class="co">#&gt;  1st Qu.:12.0   1st Qu.: 26.00  </span>
-<span class="co">#&gt;  Median :15.0   Median : 36.00  </span>
-<span class="co">#&gt;  Mean   :15.4   Mean   : 42.98  </span>
-<span class="co">#&gt;  3rd Qu.:19.0   3rd Qu.: 56.00  </span>
-<span class="co">#&gt;  Max.   :25.0   Max.   :120.00</span></code></pre></div>
-<p>You’ll still need to render <code>README.Rmd</code> regularly, to keep <code>README.md</code> up-to-date.</p>
-<p>You can also embed plots, for example:</p>
-<p><img src="reference/figures/README-pressure-1.png" width="100%"></p>
-<p>In that case, don’t forget to commit and push the resulting figure files, so they display on GitHub!</p>
+<p>This is a basic example which shows you how to solve a numerically-stable ridge regression that takes into account colinear regression variables:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># library(bis557)</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">data</span>(<span class="st">"iris"</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3"></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co"># create a colinear term</span></a>
+<a class="sourceLine" id="cb2-5" title="5">iris<span class="op">$</span>colinear &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>iris<span class="op">$</span>Petal.Width <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span></a>
+<a class="sourceLine" id="cb2-6" title="6"></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="co"># claim formula and dataset</span></a>
+<a class="sourceLine" id="cb2-8" title="8">form &lt;-<span class="st"> </span>Sepal.Length <span class="op">~</span><span class="st"> </span>.</a>
+<a class="sourceLine" id="cb2-9" title="9">d &lt;-<span class="st"> </span>iris</a>
+<a class="sourceLine" id="cb2-10" title="10"></a>
+<a class="sourceLine" id="cb2-11" title="11"><span class="co"># make model matrices</span></a>
+<a class="sourceLine" id="cb2-12" title="12">mms &lt;-<span class="st"> </span><span class="kw">make_model_matrices</span>(form, d, <span class="dt">contrasts =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb2-13" title="13">X &lt;-<span class="st"> </span>mms<span class="op">$</span>X</a>
+<a class="sourceLine" id="cb2-14" title="14">Y &lt;-<span class="st"> </span>mms<span class="op">$</span>Y</a>
+<a class="sourceLine" id="cb2-15" title="15"></a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="co"># implement ridge regression</span></a>
+<a class="sourceLine" id="cb2-17" title="17"><span class="kw">ridge_regression</span>(form, d, <span class="dt">lambda =</span> <span class="dv">10</span>)<span class="er">)</span></a></code></pre></div>
+<!--
+What is special about using `README.Rmd` instead of just `README.md`?
+You can include R chunks like so:
+
+``` r
+summary(cars)
+#>      speed           dist       
+#>  Min.   : 4.0   Min.   :  2.00  
+#>  1st Qu.:12.0   1st Qu.: 26.00  
+#>  Median :15.0   Median : 36.00  
+#>  Mean   :15.4   Mean   : 42.98  
+#>  3rd Qu.:19.0   3rd Qu.: 56.00  
+#>  Max.   :25.0   Max.   :120.00
+```
+
+You’ll still need to render `README.Rmd` regularly, to keep `README.md`
+up-to-date.
+
+You can also embed plots, for example:
+
+<img src="man/figures/README-pressure-1.png" width="100%" />
+
+In that case, don’t forget to commit and push the resulting figure
+files, so they display on GitHub\!
+
+-->
 </div>
 </div>
   </div>

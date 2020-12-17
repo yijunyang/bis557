@@ -4,7 +4,7 @@
 #' @param X design matrix
 #' @param Y response vector
 #' @param mu_fun function from eta to the expected value
-#' @param maxit integer maximum number of iterations
+#' @param maxit maximum number of iterations
 #' @param gamma The step size
 #' @param tol numeric tolerance parameter
 #' @return a list of beta coefficients

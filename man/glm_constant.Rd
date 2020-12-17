@@ -13,7 +13,7 @@ glm_constant(X, Y, mu_fun, var_fun, maxit = 1e+06, tol = 1e-10, gamma = 1e-05)
 
 \item{mu_fun}{function from eta to the expected value}
 
-\item{maxit}{integer maximum number of iterations}
+\item{maxit}{maximum number of iterations}
 
 \item{tol}{numeric tolerance parameter}
 

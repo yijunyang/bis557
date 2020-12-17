@@ -25,5 +25,6 @@ Depends:
     tibble,
     ggplot2,
     purrr,
-    glmnet
+    glmnet,
+    fastDummies
 VignetteBuilder: knitr
